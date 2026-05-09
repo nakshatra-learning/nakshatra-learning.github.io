@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EAGLE — Nakshatra's Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:    #06090f;
+      --bg2:   #0b1120;
+      --card:  #0d1629;
+      --card2: #111e36;
+      --line:  #1a2b4a;
+      --line2: #1f3560;
+      --text:  #e8edf8;
+      --muted: #6d85ab;
+      --blue:  #1760f5;
+      --blue2: #22d3ee;
+      --teal:  #22d3ee;
+      --accent:#f5a623;
+    }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; font-size: .9em; background: rgba(34,211,238,.08); padding: 2px 6px; border-radius: 5px; color: var(--blue2); }
+    kbd { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,.07); border: 1px solid var(--line2); color: var(--text); }
+    body {
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(34,211,238,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,.03) 1px, transparent 1px),
+        radial-gradient(ellipse 900px 600px at 100% -5%, rgba(34,211,238,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 600px 500px at 0% 25%, rgba(23,96,245,.10) 0%, transparent 60%);
+      background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(14px); background: rgba(6,9,15,.82); border-bottom: 1px solid var(--line); }
+    .nav-inner { max-width: 1240px; margin: 0 auto; padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo-img { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(34,211,238,.4); box-shadow: 0 0 14px rgba(34,211,238,.3); }
+    .brand-text { font-weight: 800; font-size: 17px; }
+    .brand-text span { color: var(--teal); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link { padding: 8px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--muted); border: 1px solid transparent; transition: all .2s; }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,.04); border-color: var(--line); }
+    .nav-link.active { color: #fff; background: rgba(34,211,238,.15); border-color: rgba(34,211,238,.45); }
+
+    /* PAGE HEADER */
+    .page-head { max-width: 1240px; margin: 0 auto; padding: 60px 28px 28px; }
+    .crumbs { font-size: 13px; color: var(--muted); }
+    .crumbs a:hover { color: var(--text); }
+    .page-head h1 { font-size: clamp(36px, 5vw, 58px); font-weight: 900; letter-spacing: -.03em; margin-top: 14px; }
+    .page-head h1 em { font-style: normal; background: linear-gradient(100deg, #22d3ee, #a5f3fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .page-head p { color: var(--muted); margin-top: 14px; max-width: 720px; line-height: 1.65; font-size: 16px; }
+    .page-badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px; border-radius: 999px; background: rgba(34,211,238,.1); border: 1px solid rgba(34,211,238,.3); color: var(--teal); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 14px; }
+
+    /* LAYOUT */
+    .wrap { max-width: 1240px; margin: 36px auto 100px; padding: 0 28px; display: grid; grid-template-columns: 220px 1fr; gap: 36px; }
+    @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .toc { display: none; } }
+
+    /* TOC */
+    .toc { position: sticky; top: 80px; align-self: start; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .toc-title { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 12px; }
+    .toc a { display: block; padding: 8px 12px; border-radius: 10px; font-size: 13px; color: var(--muted); transition: all .15s; }
+    .toc a:hover { background: rgba(255,255,255,.04); color: var(--text); }
+
+    /* LESSONS */
+    .lessons { display: flex; flex-direction: column; gap: 24px; }
+    .lesson {
+      background: linear-gradient(180deg, var(--card) 0%, var(--card2) 100%);
+      border: 1px solid var(--line); border-radius: 20px; padding: 28px;
+      scroll-margin-top: 84px; transition: border-color .25s;
+    }
+    .lesson:hover { border-color: rgba(34,211,238,.25); }
+    .lesson-num {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(34,211,238,.08); color: var(--teal);
+      border: 1px solid rgba(34,211,238,.25);
+      font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+    }
+    .lesson h2 { font-size: 22px; font-weight: 800; letter-spacing: -.015em; margin-top: 14px; }
+    .lesson p { color: #b8c8e0; line-height: 1.70; margin-top: 12px; font-size: 15px; }
+    .lesson ul, .lesson ol { margin-top: 12px; padding-left: 22px; color: #b8c8e0; }
+    .lesson li { margin: 7px 0; line-height: 1.65; font-size: 15px; }
+    .lesson li b { color: var(--text); }
+
+    /* Callout */
+    .callout {
+      margin-top: 18px; padding: 14px 18px; border-radius: 12px;
+      background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.22);
+      color: #fde2b1; font-size: 14px; line-height: 1.65;
+    }
+    .callout b { color: var(--accent); }
+    .callout.info { background: rgba(34,211,238,.07); border-color: rgba(34,211,238,.22); color: #a5f3fc; }
+    .callout.info b { color: var(--teal); }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    .tile { padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.025); border: 1px solid var(--line); }
+    .tile h5 { font-size: 12px; color: var(--teal); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+    .tile p { font-size: 14px; margin-top: 6px; color: #9ab0cc; line-height: 1.55; }
+
+    /* Tutorial images */
+    .tutorial-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    @media (max-width: 640px) { .tutorial-imgs { grid-template-columns: 1fr; } }
+    .tutorial-imgs.single { grid-template-columns: 1fr; }
+    .tutorial-img-wrap {
+      background: #000; border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+      position: relative;
+    }
+    .tutorial-img-wrap img { width: 100%; height: auto; display: block; object-fit: contain; max-height: 400px; }
+    .img-caption {
+      padding: 8px 12px; font-size: 11px; color: var(--muted);
+      background: rgba(0,0,0,.5); border-top: 1px solid var(--line);
+    }
+
+    /* Video */
+    .lesson-video { margin-top: 20px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+    .lesson-video video { width: 100%; max-height: 420px; display: block; }
+    .lesson-video-cap { padding: 10px 16px; font-size: 13px; color: var(--muted); background: var(--card); }
+
+    /* FOOTER */
+    footer { max-width: 1240px; margin: 0 auto; padding: 24px 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    footer a { color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./index.html">
+        <img class="logo-img" src="./imgs/IMG-20260429-WA0000.jpg" alt="SE Logo" />
+        <div class="brand-text">Nakshatra's <span>Learning</span></div>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="./index.html">Home</a>
+        <a class="nav-link active" href="./eagle.html">EAGLE</a>
+        <a class="nav-link" href="./altium.html">Altium</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-head">
+    <div class="crumbs"><a href="./index.html">Home</a> &nbsp;/&nbsp; EAGLE</div>
+    <div class="page-badge">Beginner Track · 8 Lessons</div>
+    <h1>Designing PCBs with <em>EAGLE</em></h1>
+    <p>EAGLE (by CadSoft, now Autodesk) is the go-to EDA tool for students and hobbyists. This track walks you from a blank schematic all the way to manufacturer-ready Gerber files using real tutorial screenshots and walkthroughs.</p>
+  </header>
+
+  <div class="wrap">
+    <aside class="toc">
+      <div class="toc-title">Lessons</div>
+      <a href="#l1">1 · Why a PCB?</a>
+      <a href="#l2">2 · Getting Started</a>
+      <a href="#l3">3 · Schematic Capture</a>
+      <a href="#l4">4 · Placing Components</a>
+      <a href="#l5">5 · Wiring &amp; Net Names</a>
+      <a href="#l6">6 · Creating a Custom Part</a>
+      <a href="#l7">7 · Board Layout &amp; Routing</a>
+      <a href="#l8">8 · DRC &amp; Gerber Export</a>
+    </aside>
+
+    <main class="lessons">
+
+      <!-- L1 -->
+      <section class="lesson" id="l1">
+        <span class="lesson-num">Lesson 1</span>
+        <h2>Why use a PCB instead of a breadboard?</h2>
+        <p>Breadboards are fine for quick experiments, but any serious project — high-speed, SMD-heavy, or production-ready — demands a PCB. Most modern ICs (BGA, QFN, TSSOP) cannot even be prototyped on a breadboard at all.</p>
+        <div class="grid-2">
+          <div class="tile"><h5>Breadboard ✅</h5><p>Fast prototyping, easy probing, easy circuit edits with jumper wires.</p></div>
+          <div class="tile"><h5>Breadboard ❌</h5><p>High parasitic capacitance, unreliable, can't use SMD packages, hard to replicate.</p></div>
+          <div class="tile"><h5>PCB ✅</h5><p>Professional &amp; compact, repeatable, controlled parasitics, high-speed capable, mass-producible.</p></div>
+          <div class="tile"><h5>PCB ❌</h5><p>Longer design cycle, fab cost, hard to modify post-fab, requires CAD knowledge.</p></div>
+        </div>
+        <div class="callout">A PCB becomes <b>required</b> the moment you need small SMD packages, dense routing, or controlled-impedance high-speed lines.</div>
+      </section>
+
+      <!-- L2 -->
+      <section class="lesson" id="l2">
+        <span class="lesson-num">Lesson 2</span>
+        <h2>Getting started — projects, files &amp; libraries</h2>
+        <p>Open EAGLE → <kbd>File</kbd> → <kbd>New</kbd> → <kbd>Project</kbd>. Right-click the new project → <kbd>New</kbd> → <kbd>Schematic</kbd>. Save everything inside the project folder so schematics, board files and CAM jobs stay together.</p>
+        <ul>
+          <li><b>Schematic library</b> — symbols you place on the schematic sheet.</li>
+          <li><b>Footprint (PCB) library</b> — physical land patterns and pad layouts.</li>
+          <li><b>Integrated library</b> — combines symbol + footprint into one component (recommended).</li>
+        </ul>
+        <p>EAGLE ships with broad default libraries: <code>rcl</code> for passives, <code>supply1/supply2</code> for power symbols, <code>frames</code> for sheet borders. The free edition limits boards to 4 × 3.2 inches and 2 copper layers — more than enough for most student projects.</p>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0008.jpg" alt="EAGLE Tutorial Page 2" loading="lazy" />
+            <div class="img-caption">EAGLE project setup — schematic and board files</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0009.jpg" alt="EAGLE Tutorial Page 3" loading="lazy" />
+            <div class="img-caption">Library browser and component search</div>
+          </div>
+        </div>
+        <div class="callout"><b>Warning:</b> EAGLE versions are not always forward/backward compatible. Pick one version and stick with it for the entire project lifecycle.</div>
+      </section>
+
+      <!-- L3 -->
+      <section class="lesson" id="l3">
+        <span class="lesson-num">Lesson 3</span>
+        <h2>Schematic capture — the toolbar that matters</h2>
+        <p>You'll spend 90% of schematic time with just a few tools. Learn these and you can capture any circuit:</p>
+        <div class="grid-2">
+          <div class="tile"><h5>ADD</h5><p>Open the library browser and place a component symbol on the sheet.</p></div>
+          <div class="tile"><h5>MOVE</h5><p>Left-click to grab, right-click to rotate 90°, left-click again to drop.</p></div>
+          <div class="tile"><h5>NET (wire)</h5><p>Connect pins. Right-click while drawing to change bend style.</p></div>
+          <div class="tile"><h5>NAME / LABEL</h5><p>Rename a net (e.g. <code>VCC</code>, <code>GND</code>) and show it on the sheet.</p></div>
+          <div class="tile"><h5>VALUE</h5><p>Set the value (10kΩ, 100nF…) of a placed passive component.</p></div>
+          <div class="tile"><h5>JUNCTION</h5><p>Force an electrical connection at a wire crossing point.</p></div>
+        </div>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0010.jpg" alt="EAGLE Tutorial Page 4" loading="lazy" />
+            <div class="img-caption">Schematic toolbar and tool selection</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0011.jpg" alt="EAGLE Tutorial Page 5" loading="lazy" />
+            <div class="img-caption">Placing components and wiring nets</div>
+          </div>
+        </div>
+        <div class="callout info">Always start a schematic by placing a <b>frame</b> from the <code>frames</code> library — it gives you a clean print boundary and a proper title block.</div>
+      </section>
+
+      <!-- L4 -->
+      <section class="lesson" id="l4">
+        <span class="lesson-num">Lesson 4</span>
+        <h2>Placing components — passives, ICs and pads</h2>
+        <p>Use <kbd>ADD</kbd> and search with wildcards: typing <code>*741*</code> finds the LM741 op-amp in the <code>linear</code> library. How to recognize a footprint type:</p>
+        <ul>
+          <li><b>Through-hole</b> footprints show <b>green circles</b> (drill holes with annular rings).</li>
+          <li><b>Surface-mount</b> footprints show <b>red squares</b> (SMD pads on the copper layer).</li>
+        </ul>
+        <p>For external connections (power input, signal output connectors) use pads from <code>wirepad → 2,54/1,1</code> — these become solder-in holes for wires.</p>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0012.jpg" alt="EAGLE Tutorial Page 6" loading="lazy" />
+            <div class="img-caption">Component placement — through-hole vs SMD</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0013.jpg" alt="EAGLE Tutorial Page 7" loading="lazy" />
+            <div class="img-caption">Passive components and IC symbols</div>
+          </div>
+        </div>
+        <div class="callout"><b>SMD sizing:</b> 0805, 1206 etc. are package sizes in hundredths of an inch. <code>0805</code> = 0.08″ × 0.05″. Larger packages handle more power; smaller packages perform better at high frequencies.</div>
+      </section>
+
+      <!-- L5 -->
+      <section class="lesson" id="l5">
+        <span class="lesson-num">Lesson 5</span>
+        <h2>Wiring &amp; net naming — keeping the schematic readable</h2>
+        <p>Use the <kbd>NET</kbd> tool to draw wires between pins. To avoid spaghetti, use <kbd>NAME</kbd>: rename floating wire ends to the same label (e.g. <code>GND</code>) and EAGLE treats them as connected — even without a physical wire drawn across the sheet. Then use <kbd>LABEL</kbd> to show the name visually.</p>
+        <ol>
+          <li>Add a <code>GND</code> symbol from <code>supply1</code> library.</li>
+          <li>Connect the resistor's bottom pin to it with a short wire.</li>
+          <li>Name the capacitor's other terminal "GND" — confirm <i>"merge nets?"</i> with <b>Yes</b>.</li>
+        </ol>
+        <p>Once the schematic looks clean, run <kbd>ERC</kbd> (Electrical Rule Check). Open circuits must be fixed; cosmetic warnings are usually safe to ignore with an approval marker.</p>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0014.jpg" alt="EAGLE Tutorial Page 8" loading="lazy" />
+            <div class="img-caption">Wiring nets between components</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0015.jpg" alt="EAGLE Tutorial Page 9" loading="lazy" />
+            <div class="img-caption">Net names and labels for clean schematics</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- L6 -->
+      <section class="lesson" id="l6">
+        <span class="lesson-num">Lesson 6</span>
+        <h2>Creating a custom part — symbol + package + device</h2>
+        <p>Eventually you'll need a part with no library entry (the TPS799 LDO is the classic student example). EAGLE stores a part in three pieces you build separately:</p>
+        <ol>
+          <li><b>Symbol</b> — the schematic drawing. Add pins, name them (VIN, GND, EN, NC, VOUT), face the green I/O dots outward, then box the body with the LINE tool.</li>
+          <li><b>Package</b> — the physical footprint. Set a fine grid (e.g. 0.05 mm), add SMD pads at the correct size (e.g. <code>1.1 × 0.6</code> mm for SC-70), and position them using the datasheet's mechanical drawing.</li>
+          <li><b>Device</b> — combine symbol + package and use <kbd>Connect</kbd> to map each pin name to its pad number.</li>
+        </ol>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0016.jpg" alt="EAGLE Tutorial Page 10" loading="lazy" />
+            <div class="img-caption">Building a custom symbol in the library editor</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0017.jpg" alt="EAGLE Tutorial Page 11" loading="lazy" />
+            <div class="img-caption">Creating the PCB footprint / package</div>
+          </div>
+        </div>
+        <div class="tutorial-imgs" style="margin-top:12px;">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0018.jpg" alt="EAGLE Tutorial Page 12" loading="lazy" />
+            <div class="img-caption">Connecting symbol pins to package pads in the Device editor</div>
+          </div>
+        </div>
+        <div class="callout"><b>Pro tip:</b> for standard packages (SOIC, TSSOP, QFN, etc.) reuse EAGLE's reference packages from the <code>ref-packages</code> library rather than redrawing footprints from scratch.</div>
+      </section>
+
+      <!-- L7 -->
+      <section class="lesson" id="l7">
+        <span class="lesson-num">Lesson 7</span>
+        <h2>Board layout — placement &amp; routing</h2>
+        <p>With a finished schematic, click <kbd>BOARD</kbd> on the toolbar — EAGLE creates a matching board file. Footprints appear outside the board outline, joined by yellow <i>airwires</i> showing required connections that still need copper traces.</p>
+        <ol>
+          <li>Drag footprints inside the white board outline. Group related parts: decoupling caps near IC power pins, crystals close to the MCU.</li>
+          <li>Resize the board outline to match your enclosure or size requirements.</li>
+          <li>Use <kbd>ROUTE</kbd> to convert each yellow airwire into a real copper trace. Right-click mid-route to change bend style.</li>
+          <li>Use <kbd>RIPUP</kbd> to undo a trace segment and reroute it differently.</li>
+        </ol>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0019.jpg" alt="EAGLE Tutorial Page 13" loading="lazy" />
+            <div class="img-caption">Board layout — placing footprints inside the board outline</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0020.jpg" alt="EAGLE Tutorial Page 14" loading="lazy" />
+            <div class="img-caption">Interactive trace routing and airwire connections</div>
+          </div>
+        </div>
+        <div class="tutorial-imgs" style="margin-top:12px;">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0021.jpg" alt="EAGLE Tutorial Page 15" loading="lazy" />
+            <div class="img-caption">Completed routing — all airwires converted to copper traces</div>
+          </div>
+        </div>
+        <div class="callout">Think of routing as solving a puzzle: keep traces short, avoid sharp 90° corners, and route power/ground first so signal traces have a solid return path.</div>
+
+        <div class="lesson-video">
+          <video controls preload="metadata">
+            <source src="./imgs/VID-20260507-WA0000.mp4" type="video/mp4" />
+          </video>
+          <div class="lesson-video-cap">Video: Board layout and routing walkthrough</div>
+        </div>
+      </section>
+
+      <!-- L8 -->
+      <section class="lesson" id="l8">
+        <span class="lesson-num">Lesson 8</span>
+        <h2>DRC, CAM &amp; sending Gerbers to fabrication</h2>
+        <p>Before exporting anything, run <kbd>DRC</kbd> (Design Rule Check). DRC enforces minimum trace widths, clearances and drill sizes — these numbers come from your fab house's process capabilities.</p>
+        <p>To generate manufacturing files, run the <b>CAM Processor</b>:</p>
+        <ul>
+          <li>Choose a CAM job (most fabs accept Gerber RS-274X — use the default job).</li>
+          <li>Generate one Gerber file per layer: <code>Top Copper</code>, <code>Bottom Copper</code>, <code>Top/Bottom Solder Mask</code>, <code>Top/Bottom Silkscreen</code>, <code>Board Outline</code>, <code>Drill (NC-Drill)</code>.</li>
+          <li>Zip the complete Gerber set and upload to your fabricator's portal.</li>
+        </ul>
+        <div class="tutorial-imgs">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0022.jpg" alt="EAGLE Tutorial Page 16" loading="lazy" />
+            <div class="img-caption">Design Rule Check (DRC) — reviewing violations</div>
+          </div>
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0023.jpg" alt="EAGLE Tutorial Page 17" loading="lazy" />
+            <div class="img-caption">CAM Processor — generating Gerber output files</div>
+          </div>
+        </div>
+        <div class="tutorial-imgs" style="margin-top:12px;">
+          <div class="tutorial-img-wrap">
+            <img src="./imgs/IMG-20260429-WA0024.jpg" alt="EAGLE Tutorial final" loading="lazy" />
+            <div class="img-caption">Final Gerber set ready for fabrication upload</div>
+          </div>
+        </div>
+        <div class="callout"><b>Final check:</b> open generated Gerbers in a viewer (e.g. gerbv or your fab's online viewer) <b>before</b> submitting. The fab manufactures exactly what's in those files — not what you see in EAGLE.</div>
+
+        <div class="lesson-video" style="margin-top:20px;">
+          <video controls preload="metadata">
+            <source src="./imgs/VID-20260430-WA0000.mp4" type="video/mp4" />
+          </video>
+          <div class="lesson-video-cap">Video: Schematic to board — complete EAGLE walkthrough</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <div>© 2026 Nakshatra's Learning &nbsp;•&nbsp; Software Electronic</div>
+    <div><a href="./altium.html">Next track: Altium Designer →</a></div>
+  </footer>
+
+</body>
+</html>
